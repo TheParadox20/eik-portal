@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
         <ContextProvider>
           <Suspense>
             {
-              !true ? <Maintenance duration={"July 29, 2025"} /> : children
+              true ? <Maintenance duration={"October 8, 2025"} /> : children
             }
             <Popup />
           </Suspense>
