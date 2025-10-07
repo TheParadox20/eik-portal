@@ -1,4 +1,5 @@
 'use client'
+
 import SideNav from "@/app/ui/sidenav";
 import useUser from "@/app/lib/hooks/useUser";
 import { Bars3Icon, ChevronDownIcon, LockClosedIcon, ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
@@ -30,8 +31,12 @@ export default async function Layout({children}){
         else setShowOverlay(true)
     },[overlay])
 
+    useEffect(()=>{
+        if(isError) router.push('/login')
+    },[user, isError])
+
     if (isLoading) return <Spinner />
-    if (isError) return <>xxx{router.push('/login')}</>
+    if (isError) return <>xxx{isError?.message}</>
 
     return(
         <div className="flex">

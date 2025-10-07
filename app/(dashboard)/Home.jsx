@@ -2,7 +2,7 @@
 import Link from "next/link"
 import { Suspense, useState } from "react"
 import useSWR from "swr";
-import { fetcher, getData, postData } from "@/app/lib/data";
+import { fetcher, getData, postData,deleteData } from "@/app/lib/data";
 import Spinner from "@/app/ui/Spinner";
 import useUser from "@/app/lib/hooks/useUser";
 import useProfile from "@/app/lib/hooks/useProfile"
@@ -89,8 +89,10 @@ function TWG({joined, twg, key, mutate}){
 
     let join = (e, twg, action) => {
         e.preventDefault();
-        if(action) getData(()=>{mutate()},'/twg/join',{twg})
-        else getData(()=>{mutate()},'/twg/exit',{twg})
+        if(action){
+            postData(()=>{mutate()},{group_id:twg},'/groups')
+        }
+        else deleteData(()=>{mutate()},{},`/groups/${twg}`)
     }
 
     return(
@@ -132,7 +134,7 @@ function TWG({joined, twg, key, mutate}){
                                     Key Responsibilities
                                 </h6>
                                 <ul className="space-y-2">
-                                    {twg.responsibility?.map((resp, index) => (
+                                    {JSON.parse(twg.responsibility)?.map((resp, index) => (
                                         <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                                             <span className="w-2 h-2 bg-secondary rounded-full mt-2 flex-shrink-0"></span>
                                             <span>{resp}</span>
@@ -149,7 +151,7 @@ function TWG({joined, twg, key, mutate}){
                                     Ideal Membership
                                 </h6>
                                 <ul className="space-y-2">
-                                    {twg.membership?.map((member, index) => (
+                                    {JSON.parse(twg.membership)?.map((member, index) => (
                                         <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                                             <span className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></span>
                                             <span>{member}</span>
@@ -169,7 +171,7 @@ function TWG({joined, twg, key, mutate}){
                         {showDetails ? 'Hide Details' : 'View Details'}
                     </button>
                     <button 
-                        onClick={e=>join(e,twg.name, !joined)} 
+                        onClick={e=>join(e,twg.id, !joined)} 
                         className={`${joined ? 'bg-warning hover:bg-warning/80' : 'bg-secondary hover:bg-secondary/80'} text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 hover:scale-105`}
                     >
                         {joined ? 'Leave Group' : 'Join Group'}
@@ -181,7 +183,8 @@ function TWG({joined, twg, key, mutate}){
 }
 
 function TWGs(){
-    const { data:twgs, error, isLoading, mutate } = useSWR(['/twg/index',{}], fetcher)
+    const { data:twgs, error, isLoading } = useSWR(['/all-groups',{}], fetcher)
+    const { data:groups, error:groupsError, isLoading:groupsLoading, mutate } = useSWR(['/groups',{}], fetcher)
 
     return(
         <section className="mb-12">
@@ -199,13 +202,13 @@ function TWGs(){
                 </p>
             </div>
             {
-                (isLoading || error) ?
+                (isLoading || error || groupsLoading || groupsError) ?
                 <div className="w-full h-[10vh]"><Spinner internal={true} /></div>
                 :
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {
-                        twgs?.all?.map((twg, i) => {
-                            return <TWG key={i} twg={twg} mutate={mutate} joined={Array.isArray(twgs.twgs) ? twgs.twgs.includes(twg.name) : false} />
+                        twgs?.map((twg, i) => {
+                            return <TWG key={i} twg={twg} mutate={mutate} joined={groups?.data?.find(group => group.group_id === twg.id)} />
                         })
                     }
                 </div>
@@ -233,6 +236,7 @@ export default function Home(){
     
     if (isLoading  || isProfileLoading) return <Spinner />
     if (isError || isProfileError) return <div>Server error</div>
+
 
     const name = user.name.split(' ');
     if(name.length==1) name.push('');
@@ -325,7 +329,7 @@ export default function Home(){
                             <div className="font-semibold whitespace-nowrap text-lg">Technical Working Groups:</div>
                             <div>
                                 {
-                                 profile?.twgs?.twgs.map((twg,i)=>(<span className="block my-1 md:whitespace-nowrap" key={i}>{twg}</span>))   
+                                 profile?.twgs?.map((twg,i)=>(<span className="block my-1 md:whitespace-nowrap" key={i}>{twg.all_groups.name}</span>))   
                                 }
                             </div>
                         </div>

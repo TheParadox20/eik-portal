@@ -13,7 +13,11 @@ export default function Login() {
 
     let router = useRouter();
 
-    const { user, isLoading, isError } = useUser()
+    const { user, isLoading, isError, mutate } = useUser()
+
+    useEffect(()=>{
+        if(user) router.push('/')
+    },[user])
 
     let login = (e) => {
         e.preventDefault()
@@ -36,6 +40,7 @@ export default function Login() {
             }
             if(!save('token', data.user.token)) alert('Error saving token');
             popupE('ok', 'Success', 'Login successful')
+            mutate()
             setTimeout(()=>{
                 router.push('/')
             }, 500)

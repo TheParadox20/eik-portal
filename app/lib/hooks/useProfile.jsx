@@ -6,9 +6,9 @@ export default function useProfile (id, role) {
     const { data:requirements, requirementsError, requirementsLoading } = useSWR(['/files/requirements',{id,role}], fetcher, {revalidateIfStale: false})
     const { data:photo, photoError, photoLoading } = useSWR(['/files/profile',{id,role}], fetcher, {revalidateIfStale: false})
     const { data:training, trainingError, trainingLoading } = useSWR(['/training/attended',{id,role}], fetcher, {revalidateIfStale: false})
-    const { data:twgs, twgError, twgLoading } = useSWR(['/twg/index',{}], fetcher, {revalidateIfStale: false})
+    const { data:groups, error:groupsError, isLoading:groupsLoading } = useSWR(['/groups',{}], fetcher)
 
-    if (profileError || requirementsError || photoError || trainingError || twgError) popupE('error', 'Error', 'Server Error')
+    if (profileError || requirementsError || photoError || trainingError || groupsError) popupE('error', 'Error', 'Server Error')
 
     return {
         data: {
@@ -16,9 +16,9 @@ export default function useProfile (id, role) {
             requirements:requirements, 
             photo: photo,
             trainings: training,
-            twgs: twgs
+            twgs: groups?.data
         },
-        isLoading: profileLoading || requirementsLoading || photoLoading || trainingLoading || twgLoading,
-        isError: profileError || requirementsError || photoError || trainingError || twgError
+        isLoading: profileLoading || requirementsLoading || photoLoading || trainingLoading || groupsLoading,
+        isError: profileError || requirementsError || photoError || trainingError || groupsError
     }
 }

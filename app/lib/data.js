@@ -117,6 +117,25 @@ export function putData(setData,data,endpoint,token = load('token'), url = proce
     });
 }
 
+export function deleteData(setData,data,endpoint,token = load('token'), url = process.env.NEXT_PUBLIC_API_URL) {
+    fetch(`${url}${endpoint}`, {
+        method: "DELETE",
+        headers:{
+            'Authorization': `Bearer ${token}`,
+        },
+    }).then((res) => res.json())
+    .then((data) => {
+        console.log(`From ${endpoint}`, data)
+        if (data.error) popupE('error', 'Error', data.error)
+        if (data.message) popupE('ok', 'Success', data.message)
+        setData(data);
+    })
+    .catch(err => {
+        console.log(err)
+        popupE('error', 'Error', 'Server Error')
+    });
+}
+
 export function fetcher([endpoint,parameters, token=load('token'), url=process.env.NEXT_PUBLIC_API_URL]) {
     // if (load('token') == null) throw new Error('Session Expired')
     let params = new URLSearchParams(parameters).toString();
