@@ -28,17 +28,17 @@ export function Categories({type, setType, cat, setCategory}){
             anualFee: 10000
         }
         ,
-        {
-            name: 'Honorary',
-            entryFee: 0,
-            anualFee: 0
-        }
-        ,
-        {
-            name: 'Fellow',
-            entryFee: 0,
-            anualFee: 0
-        }
+        // {
+        //     name: 'Honorary',
+        //     entryFee: 0,
+        //     anualFee: 0
+        // }
+        // ,
+        // {
+        //     name: 'Fellow',
+        //     entryFee: 0,
+        //     anualFee: 0
+        // }
     ]
 
     if(type==='individual')
