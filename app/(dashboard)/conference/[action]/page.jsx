@@ -3,15 +3,54 @@
 import { useState, useRef, useEffect } from "react"
 import { useParams, useSearchParams } from "next/navigation";
 import useSWR from 'swr';
-import { fetcher } from '@/app/lib/data';
 import Spinner from '@/app/ui/Spinner';
-import { postData, postFile } from "@/app/lib/data";
+import { postData, postFile, fetcher } from "@/app/lib/data";
 import Overlay from "@/app/ui/overlay";
 import File from "@/app/ui/File";
 
 function Roles({conference}){
     const [files, setFiles] = useState([]);
     const [active, setActive] = useState(0);
+    const [className, setClassName] = useState({
+        name: {
+            color: '#587d33',
+            fontFamily: 'DancingScript',
+            fontSize: '75px',
+            position: 'absolute',
+            top: '240px',
+        },
+        number: {
+            color: '#78a330',
+            fontSize: '22px',
+            lineHeight: '18px',
+            position: 'absolute',
+            bottom: '3%',
+            right: '5%',
+            fontFamily: 'Times New Roman, Times, serif',
+        },
+        info: {
+            display: 'none',
+            width: '75%',
+            textAlign: 'center',
+            position: 'absolute',
+            top: '390px',
+            left: '220px',
+        },
+        date: {
+            display: 'none',
+            width: '100%',
+            textAlign: 'center',
+            position: 'absolute',
+            bottom: '105px',
+            fontSize: '18px',
+            lineHeight: '28px',
+        },
+        qrData: {
+            position: 'absolute',
+            bottom: '10%',
+            right: '5%',
+        }
+    });
 
     const { data, error, isLoading } = useSWR([`/conference/roles/${conference?.id}`,{}], fetcher)
 
@@ -28,15 +67,34 @@ function Roles({conference}){
 
     const submit = (e)=>{
         e.preventDefault();
+        // Convert nested className fields to a flat string/object structure to avoid [object Object]
+        // For simplicity, serialize to JSON. Backend should handle or parse as needed.
         postFile(
             (response)=>{
                 if(response.success){
-                    change(e,true);
+                    postData(
+                        (response)=>{
+                            if(response.success){
+                                change(e,true);
+                            }
+                        },
+                        {
+                            certificate_view_id: response?.data?.id,
+                        },
+                        `/conference/roles/update/${data?.data?.[active]?.id}`
+                    )
                 }
             },
             files[0],
-            {},
-            `/conference/roles/update/${data?.data?.[active]?.id}`
+            {
+                ...Object.keys(className).reduce((acc, key) => {
+                  acc[key] = typeof className[key] === 'object'
+                    ? JSON.stringify(className[key])
+                    : className[key];
+                  return acc;
+                }, {}),
+            },
+            `/certificate-views`
         )
     }
 
@@ -44,10 +102,47 @@ function Roles({conference}){
     if (error) return <p className="bg-white p-5">Error when fetching conference {conference?.name} roles</p>
 
     return(
-        <div className="bg-white p-5 min-w-[33vw] max-w-[40vw] rounded-lg">
+        <div className="bg-white p-5 min-w-[33vw] max-w-[60vw] max-h-[80vh] overflow-y-auto large-scroll rounded-lg">
             <h5 className="text-lg text-center font-semibold my-5">Certificate Templates for {conference?.Name}</h5>
 
-            <h6 className="text-sm font-semibold mb-4">{data?.data?.[active]?.Name}</h6>
+            <h6 className="text-sm font-semibold mb-4">Role: {data?.data?.[active]?.Name}</h6>
+
+            {/* View to edit className state properties */}
+            <div className="mb-5 bg-gray-50 p-4 rounded-md border">
+                <h6 className="font-semibold mb-3 text-xs text-gray-600">Certificate Properties per Role</h6>
+                {Object.keys(className).map((roleKey) => (
+                  <div key={roleKey} className="mb-4">
+                    <div className="font-bold text-sm mb-2 capitalize">{roleKey}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {className[roleKey] && typeof className[roleKey] === 'object' && Object.keys(className[roleKey]).map((propKey) => (
+                        <div key={propKey} className="flex items-center gap-2">
+                          <label className="text-xs w-28 capitalize" htmlFor={`input-${roleKey}-${propKey}`}>{propKey}</label>
+                          <input
+                            id={`input-${roleKey}-${propKey}`}
+                            type={typeof className[roleKey][propKey] === "number" ? "number" : "text"}
+                            className="border px-2 py-1 rounded text-xs flex-1"
+                            value={className[roleKey][propKey] ?? ""}
+                            onChange={e => {
+                              let val = e.target.value;
+                              if (typeof className[roleKey][propKey] === "number") {
+                                val = Number(val);
+                                if (isNaN(val)) val = 0;
+                              }
+                              setClassName(prev => ({
+                                ...prev,
+                                [roleKey]: {
+                                  ...prev[roleKey],
+                                  [propKey]: val
+                                }
+                              }));
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
 
             <File files={files} setFiles={setFiles} type={'image'}/>
 
@@ -77,7 +172,7 @@ export default function CreateConferencePage(){
 
     let conferenceRef = useRef({});
 
-    const { data:conference, error, isLoading } = useSWR([`/conference/${id}`,{}], fetcher,{
+    const { data:conference } = useSWR([`/conference/${id}`,{}], fetcher,{
         errorRetryInterval:600000000
     })
 
@@ -91,8 +186,6 @@ export default function CreateConferencePage(){
             setRoles(r)
         }
     },[conference])
-
-    if (isLoading) return <Spinner/>
 
     const submit = (e)=>{
         e.preventDefault();
@@ -151,6 +244,12 @@ export default function CreateConferencePage(){
                   placeholder="Role"
                   value={role}
                   onChange={e=>setRole(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && role.trim() !== "") {
+                    setRoles([...roles, role]);
+                    setRole('');
+                  }
+                }}
                 />
                 <button 
                   className="bg-primary text-white px-5 py-2 rounded-lg hover:scale-105"

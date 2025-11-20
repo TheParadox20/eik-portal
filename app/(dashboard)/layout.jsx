@@ -35,7 +35,7 @@ export default async function Layout({children}){
         if(isError) router.push('/login')
     },[user, isError])
 
-    if (isLoading) return <Spinner />
+    if ((isLoading && !user)) return <Spinner />
     if (isError) return <>xxx{isError?.message}</>
 
     return(
