@@ -209,7 +209,7 @@ export default function Individual({id,role}){
                                 <span className="font-bold w-fit">Start & Finish Date:</span>
                                 <span className="md:whitespace-nowrap">{training.Start} - {training.End}</span>
                                 <span className="font-bold w-fit">Info</span>
-                                <p className="md:whitespace-nowrap">{training.Info}</p>
+                                <div dangerouslySetInnerHTML={{ __html: training.Info }} />
                                 <button className="text-secondary text-sm mt-2" onClick={e=>getFile(`${training.Name}.pdf`,'/training/download',{number:training.Number,training:training.id})}>Download certificate</button>
                             </div>
                         )
@@ -219,19 +219,19 @@ export default function Individual({id,role}){
                 }
             </section>
             <section>
-                <SectionHead section={'Trainings'}/>
+                <SectionHead section={'Conferences'}/>
                 {
-                    (profile.trainings != undefined && profile.trainings.length>0)?
-                    profile.trainings.map((training, index) => {
+                    (profile.conferences != undefined && profile.conferences.length>0)?
+                    profile.conferences.map((conference, index) => {
                         return(
-                            <div key={index} className="grid grid-cols-2 md:w-1/3 gap-y-1">
+                            <div key={index} className="grid grid-cols-2 md:w-1/3 gap-y-1 my-2">
                                 <span className="font-bold w-fit">Title:</span>
-                                <span className="md:whitespace-nowrap">{training.Name}</span>
+                                <span className="md:whitespace-nowrap">{conference.conference.Name}</span>
+                                <span className="font-bold w-fit">CPD points:</span>
+                                <span className="md:whitespace-nowrap">{conference.conference.CPD}</span>
                                 <span className="font-bold w-fit">Start & Finish Date:</span>
-                                <span className="md:whitespace-nowrap">{training.Start} - {training.End}</span>
-                                <span className="font-bold w-fit">Info</span>
-                                <p className="md:whitespace-nowrap">{training.Info}</p>
-                                <button className="text-secondary text-sm mt-2" onClick={e=>getFile(`${training.Name}.pdf`,'/training/download',{number:training.Number,training:training.id})}>Download certificate</button>
+                                <span className="md:whitespace-nowrap">{conference.conference.StartDate} - {conference.conference.EndDate}</span>
+                                <button className="text-secondary text-sm mt-2" onClick={e=>getFile(`${conference.conference.Name}.pdf`,`/conference/download/${conference.id}`,{})}>Download certificate</button>
                             </div>
                         )
                     })
