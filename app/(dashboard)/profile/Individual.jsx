@@ -236,7 +236,7 @@ export default function Individual({id,role}){
                         )
                     })
                     :
-                    <p className="text-center my-8">You {"haven't"} participated in a training yet <a href="https://elearning.eik.co.ke/" target="blank" className="text-secondary">Sign up now</a></p>
+                    <p className="text-center my-8">You {"haven't"} participated in a conference yet <a href="https://conference.eik.co.ke/" target="blank" className="text-secondary">Sign up now</a></p>
                 }
             </section>
             <section>
