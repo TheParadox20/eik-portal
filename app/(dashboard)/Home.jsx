@@ -408,7 +408,7 @@ export default function Home(){
         <Overlay control={setOverlay} className={`${overlay!=''?'flex items-center justify-center':'hidden'}`} >
             {
             overlay=='Pay' &&
-            <div className="bg-white px-8 py-6 rounded-md md:w-1/3">
+            <div className="bg-white px-8 py-6 rounded-md md:w-[30vw]">
                 <div className="flex justify-between mb-6">
                     <h6 className="font-semibold text-lg">Make Payment</h6>
                     <button onClick={e=>setOverlay('')}><XMarkIcon className="w-8 h-8"/></button>

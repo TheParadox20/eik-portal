@@ -74,7 +74,7 @@ export default function Pay({title, description, amount, email, phone, name}){
     }
 
     return (
-        <div className='mx-2'>
+        <div className='mx-2 w-full'>
             <div className='flex gap-6 mb-2'>
                 <button className='flex items-center font-semibold' onClick={e=>setPaymentMethod('mpesa')}>
                     {/* <div className={`rounded-full md:w-5 md:h-5 w-7 h-4 ${paymentMethod=='mpesa'?'bg-primary':'border-2'}`}></div> */}

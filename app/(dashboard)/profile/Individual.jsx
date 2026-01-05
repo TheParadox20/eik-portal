@@ -308,7 +308,7 @@ export default function Individual({id,role}){
         <Overlay control={setOverlay} className={`${overlay!=''?'flex items-center justify-center':'hidden'}`} >
             {
             overlay=='Pay' &&
-            <div className="bg-white px-8 py-6 rounded-md">
+            <div className="bg-white px-8 py-6 rounded-md min-w-96">
                 <div className="flex mb-8 justify-end items-center py-3 sticky -top-1 bg-white z-50 border-b-2">
                     <XMarkIcon className="w-8 h-8" onClick={e=>setOverlay('')} />
                 </div>
