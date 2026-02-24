@@ -333,6 +333,34 @@ export default function Home(){
                                 }
                             </div>
                         </div>
+
+                        <section className="bg-gray-100/50 shadow-sm p-5 rounded-lg w-fit my-10">
+                            <h6 className="text-sm font-semibold mb-4 w-fit">CPD Breakdown</h6>
+                            <p className="font-semibold mb-3">Conferences</p>
+                            <div className="grid grid-cols-2 gap-y-5 gap-x-10 w-fit mb-7">
+                                {
+                                    profile.conferences?.map(conference=>(
+                                        <>
+                                        <p className="">{conference.conference.Name}</p>
+                                        <p>{conference.conference.CPD}</p>
+                                        </>
+                                    ))
+                                }
+                            </div>
+
+                            <p className="font-semibold mb-3">Trainings</p>
+                            <div className="grid grid-cols-2 gap-y-5 gap-x-10 w-fit">
+                                {
+                                    profile.trainings?.map(training=>(
+                                        <>
+                                        <p>{training.Name}</p>
+                                        <p className="w-fit">{training.CPD}</p>
+                                        </>
+                                    ))
+                                }
+                            </div>
+                        </section>
+
                         {
                             !user?.active &&
                             <div className="md:w-1/2 mt-4">
