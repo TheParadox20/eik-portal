@@ -1,6 +1,7 @@
 import "./globals.css";
 import ContextProvider from "@/app/lib/ContextProvider";
 import { Montserrat } from "next/font/google";
+import Script from "next/script";
 import { Suspense } from "react";
 import Popup from "@/app/ui/Popup";
 import Maintenance from "./ui/Maintenance";
@@ -24,6 +25,18 @@ export default function RootLayout({ children }) {
             <Popup />
           </Suspense>
         </ContextProvider>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-GLSYTLFHJD"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-GLSYTLFHJD');
+          `}
+        </Script>
       </body>
     </html>
   );
