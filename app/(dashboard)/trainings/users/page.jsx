@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from "react";
-import { UserCircleIcon, PlusIcon, EllipsisVerticalIcon, TrashIcon, ArrowDownTrayIcon, AtSymbolIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, PlusIcon, DocumentIcon, EllipsisVerticalIcon, TrashIcon, ArrowDownTrayIcon, AtSymbolIcon } from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import Spinner from "@/app/ui/Spinner";
@@ -11,6 +11,8 @@ import Add from "./Add";
 import Upload from "./Upload";
 import Delete from "./Delete";
 import Edit from "./Edit";
+import Role from "./Role";
+import Templates from "./Templates";
 
 export default function Users(){
     let params = useSearchParams();
@@ -107,6 +109,8 @@ export default function Users(){
             <Head Range={Range} total={total} Search={Search} Title={'Attendees'} TH={TH} Sort={Sort} placeholder={'Search attendees'} Genesis={Genesis}>
                 <div className="flex gap-4">
                     <button className='flex items-center bg-secondary text-white px-4 py-2 rounded-md font-semibold gap-2' onClick={e=>setOverlay('add')}> <PlusIcon className='w-5 h-5'/> Add user</button>
+                    <button className='flex items-center bg-secondary text-white px-4 py-2 rounded-md font-semibold gap-2' onClick={e=>setOverlay('role')}> <PlusIcon className='w-5 h-5'/> Add role</button>
+                    <button className='flex items-center bg-secondary text-white px-4 py-2 rounded-md font-semibold gap-2' onClick={e=>setOverlay('templates')}> <DocumentIcon className='w-5 h-5'/> Role certificates</button>
                     <button className='flex items-center bg-secondary text-white px-4 py-2 rounded-md font-semibold gap-2' onClick={e=>setOverlay('upload')}> <PlusIcon className='w-5 h-5'/> Upload file</button>
                 </div>
             </Head>
@@ -118,7 +122,7 @@ export default function Users(){
                     <thead className="capitalize bg-gray-100 sticky top-0 z-20">
                         <tr>
                         {
-                            ['','','name','email','Number'].map((th, index) => {
+                            ['','','name','email','Role','Number'].map((th, index) => {
                                 if(index==1) return <th key={index} onClick={e=>selectAll(e)}><input className='scale-125' type="checkbox" name="" id="" /></th>
                                 return (<th key={index} scope="col" className="px-6 py-3 whitespace-nowrap">{th}</th>)
                             })
@@ -152,6 +156,7 @@ export default function Users(){
                                         <td><input type="checkbox" name="" id={`checkbox-${index}`}/></td>
                                         <td className="px-6 py-4 whitespace-nowrap">{data['Name']}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap ${data['Sent']!=null?(data['Sent']==1?'text-primary':'text-warning'):null}`}>{data['Email']}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{data['role']?.Name}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">{data['Number']}</td>
                                         <td className="px-6 py-4 whitespace-nowrap relative">
                                             <button onClick={e=>setOptionsAt(index)}>
@@ -198,9 +203,11 @@ export default function Users(){
 
             <Overlay control={setOverlay} className={`${overlay!=''?'block':'hidden'}`} >
                 {overlay === 'add' && <Add control={setOverlay} training={id} mutate={mutate} />}
+                {overlay === 'role' && <Role control={setOverlay} training={id} />}
+                {overlay === 'templates' && <Templates control={setOverlay} training={id} />}
                 {overlay === 'upload' && <Upload control={setOverlay} csv={csv} setCSV={setCSV} />}
                 {overlay === 'delete' && <Delete control={setOverlay} data={data[optionsAt]} />}
-                {overlay === 'edit' && <Edit control={setOverlay} mutate={mutate} data={data[optionsAt]} />}
+                {overlay === 'edit' && <Edit control={setOverlay} mutate={mutate} training={id} data={data[optionsAt]} />}
             </Overlay>
         </div>
     )
